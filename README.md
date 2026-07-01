@@ -1,7 +1,7 @@
 # langchain-mimir
 
 Persistent, local-first, encrypted memory for [LangChain](https://www.langchain.com/),
-backed by [Mimir](https://github.com/Perseus-Computing-LLC/mimir) — an open-source
+backed by [Mneme](https://github.com/Perseus-Computing-LLC/mneme) (formerly "Mimir") — an open-source
 (MIT) memory engine with FTS5 + dense hybrid search and optional AES-256-GCM
 encryption, exposed over the Model Context Protocol (MCP) stdio transport.
 
@@ -11,7 +11,7 @@ service, no cloud.
 
 ## What you get
 
-This package wraps Mimir using the modern `langchain-core` interfaces:
+This package wraps Mneme using the modern `langchain-core` interfaces:
 
 - **`create_mimir_tools(client)`** — a pair of `StructuredTool`s
   (`mimir_remember` / `mimir_recall`) you give to an agent so it can manage its
@@ -28,7 +28,7 @@ This package talks to a local `mimir` executable via JSON-RPC over stdio. You
 must have it installed:
 
 - Download a release from
-  <https://github.com/Perseus-Computing-LLC/mimir/releases>, or build from source
+  <https://github.com/Perseus-Computing-LLC/mneme/releases>, or build from source
   (`cargo build --release`), and put `mimir` on your `$PATH`.
 - Or pass an absolute path: `MimirClient(mimir_binary="/path/to/mimir")`.
 
