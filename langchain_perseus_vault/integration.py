@@ -2,17 +2,19 @@
 
 Two complementary, current-recommended ``langchain-core`` surfaces are exposed:
 
-1. **Tools** — :func:`create_mimir_tools` returns a pair of ``StructuredTool``s
-   (``mimir_remember`` / ``mimir_recall``) that an agent can call to persist and
-   retrieve long-term memory. Tool-calling is the modern LangChain pattern for
-   giving an agent agency over its own memory (the legacy ``Memory`` /
-   ``ConversationBufferMemory`` classes are deprecated).
+1. **Tools** — :func:`create_perseus_vault_tools` returns a pair of
+   ``StructuredTool``s (``perseus_vault_remember`` / ``perseus_vault_recall``)
+   that an agent can call to persist and retrieve long-term memory. Tool-calling
+   is the modern LangChain pattern for giving an agent agency over its own
+   memory (the legacy ``Memory`` / ``ConversationBufferMemory`` classes are
+   deprecated).
 
-2. **Retriever** — :class:`MimirRetriever` is a ``BaseRetriever`` that turns a
-   query into ``Document`` objects, for drop-in use in RAG chains and anywhere a
-   LangChain retriever is accepted (``.invoke(query)``).
+2. **Retriever** — :class:`PerseusVaultRetriever` is a ``BaseRetriever`` that
+   turns a query into ``Document`` objects, for drop-in use in RAG chains and
+   anywhere a LangChain retriever is accepted (``.invoke(query)``).
 
-Both are thin wrappers over :class:`langchain_perseus_vault.client.MimirClient`.
+Both are thin wrappers over
+:class:`langchain_perseus_vault.client.PerseusVaultClient`.
 """
 
 from __future__ import annotations
@@ -26,11 +28,11 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.tools import StructuredTool
 from pydantic import BaseModel, Field
 
-from .client import MimirClient
+from .client import PerseusVaultClient
 
 __all__ = [
-    "MimirRetriever",
-    "create_mimir_tools",
+    "PerseusVaultRetriever",
+    "create_perseus_vault_tools",
     "create_remember_tool",
     "create_recall_tool",
 ]
@@ -40,7 +42,7 @@ __all__ = [
 
 
 def _item_to_text(item: dict) -> str:
-    """Extracts the best human-readable text from a Mimir recall item."""
+    """Extracts the best human-readable text from a Perseus Vault recall item."""
     text = item.get("text")
     if text:
         return text
@@ -56,7 +58,7 @@ def _item_to_text(item: dict) -> str:
 
 
 def _item_to_document(item: dict) -> Document:
-    """Converts a raw Mimir recall item into a LangChain ``Document``."""
+    """Converts a raw Perseus Vault recall item into a LangChain ``Document``."""
     return Document(
         page_content=_item_to_text(item),
         metadata={
@@ -73,25 +75,25 @@ def _item_to_document(item: dict) -> Document:
 # ── retriever ────────────────────────────────────────────────────────────────
 
 
-class MimirRetriever(BaseRetriever):
-    """Retriever backed by Mimir's FTS5 keyword search.
+class PerseusVaultRetriever(BaseRetriever):
+    """Retriever backed by Perseus Vault's FTS5 keyword search.
 
     Example::
 
-        from langchain_perseus_vault import MimirClient, MimirRetriever
+        from langchain_perseus_vault import PerseusVaultClient, PerseusVaultRetriever
 
-        client = MimirClient(db_path="~/.langchain/mimir.db")
+        client = PerseusVaultClient(db_path="~/.langchain/mimir.db")
         client.remember("The capital of France is Paris.")
 
-        retriever = MimirRetriever(client=client)
+        retriever = PerseusVaultRetriever(client=client)
         docs = retriever.invoke("What is the capital of France?")
     """
 
-    client: MimirClient
+    client: PerseusVaultClient
     k: int = 5
     category: str | None = None
 
-    # MimirClient is an arbitrary (non-pydantic) type.
+    # PerseusVaultClient is an arbitrary (non-pydantic) type.
     model_config = {"arbitrary_types_allowed": True}
 
     def _get_relevant_documents(
@@ -120,11 +122,11 @@ class _RecallInput(BaseModel):
 
 
 def create_remember_tool(
-    client: MimirClient,
+    client: PerseusVaultClient,
     *,
     category: str = "langchain-memory",
 ) -> StructuredTool:
-    """Builds a ``StructuredTool`` that stores a memory in Mimir."""
+    """Builds a ``StructuredTool`` that stores a memory in Perseus Vault."""
 
     def _remember(text: str, tags: list[str] | None = None) -> str:
         result = client.remember(text, category=category, tags=tags)
@@ -134,7 +136,7 @@ def create_remember_tool(
 
     return StructuredTool.from_function(
         func=_remember,
-        name="mimir_remember",
+        name="perseus_vault_remember",
         description=(
             "Store a fact or memory in long-term persistent memory so it can be "
             "recalled in future conversations. Use this whenever the user shares "
@@ -145,11 +147,11 @@ def create_remember_tool(
 
 
 def create_recall_tool(
-    client: MimirClient,
+    client: PerseusVaultClient,
     *,
     category: str | None = "langchain-memory",
 ) -> StructuredTool:
-    """Builds a ``StructuredTool`` that searches Mimir's memory."""
+    """Builds a ``StructuredTool`` that searches Perseus Vault's memory."""
 
     def _recall(query: str, limit: int = 5) -> str:
         items = client.recall(query, limit=limit, category=category)
@@ -160,7 +162,7 @@ def create_recall_tool(
 
     return StructuredTool.from_function(
         func=_recall,
-        name="mimir_recall",
+        name="perseus_vault_recall",
         description=(
             "Search long-term persistent memory for facts relevant to a query. "
             "Use this to recall things the user told you in past conversations."
@@ -169,8 +171,8 @@ def create_recall_tool(
     )
 
 
-def create_mimir_tools(
-    client: MimirClient,
+def create_perseus_vault_tools(
+    client: PerseusVaultClient,
     *,
     category: str = "langchain-memory",
 ) -> list[StructuredTool]:
@@ -180,8 +182,8 @@ def create_mimir_tools(
     model agency over its own persistent memory.
 
     Args:
-        client: An initialized :class:`MimirClient`.
-        category: The Mimir category (namespace) used for both tools.
+        client: An initialized :class:`PerseusVaultClient`.
+        category: The Perseus Vault category (namespace) used for both tools.
     """
     return [
         create_remember_tool(client, category=category),
