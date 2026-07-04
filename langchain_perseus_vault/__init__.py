@@ -1,9 +1,9 @@
-"""langchain-mimir — Mimir persistent memory for LangChain.
+"""langchain-perseus-vault — Perseus Vault persistent memory for LangChain.
 
-Mimir (github.com/Perseus-Computing-LLC/mimir) is an open-source (MIT),
-local-first, encrypted persistent memory engine that speaks MCP JSON-RPC over
-stdio. This package exposes it to LangChain via the modern ``langchain-core``
-interfaces:
+Perseus Vault (github.com/Perseus-Computing-LLC/perseus-vault) is an
+open-source (MIT), local-first, encrypted persistent memory engine that speaks
+MCP JSON-RPC over stdio. This package exposes it to LangChain via the modern
+``langchain-core`` interfaces:
 
 - :class:`MimirClient` — low-level stdio client for the ``mimir`` binary.
 - :func:`create_mimir_tools` — ``StructuredTool``s (remember / recall) for agents.
@@ -11,7 +11,7 @@ interfaces:
 
 Requirements:
     A ``mimir`` binary must be on ``$PATH`` or passed via ``mimir_binary=``.
-    Download from https://github.com/Perseus-Computing-LLC/mimir/releases
+    Download from https://github.com/Perseus-Computing-LLC/perseus-vault/releases
 """
 
 from .client import MimirClient, MimirError
