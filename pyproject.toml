@@ -3,16 +3,16 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "langchain-mimir"
+name = "langchain-perseus-vault"
 version = "0.1.0"
 authors = [
     { name = "Perseus Computing LLC", email = "hermes@perseus.observer" },
 ]
-description = "Mimir persistent, local, encrypted memory for LangChain — tools and a retriever backed by the Mimir MCP engine."
+description = "Perseus Vault persistent, local, encrypted memory for LangChain — tools and a retriever backed by the Perseus Vault MCP engine."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
-keywords = ["langchain", "mimir", "memory", "mcp", "retriever", "agents", "llm"]
+keywords = ["langchain", "perseus-vault", "memory", "mcp", "retriever", "agents", "llm"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -36,7 +36,7 @@ test = ["pytest>=7.0"]
 Homepage = "https://github.com/Perseus-Computing-LLC/langchain-mimir"
 Repository = "https://github.com/Perseus-Computing-LLC/langchain-mimir"
 "Bug Tracker" = "https://github.com/Perseus-Computing-LLC/langchain-mimir/issues"
-Mimir = "https://github.com/Perseus-Computing-LLC/mimir"
+"Perseus Vault" = "https://github.com/Perseus-Computing-LLC/perseus-vault"
 
 [tool.hatch.build.targets.wheel]
-packages = ["langchain_mimir"]
+packages = ["langchain_perseus_vault"]

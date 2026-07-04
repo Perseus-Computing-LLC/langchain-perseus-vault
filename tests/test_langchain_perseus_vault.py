@@ -1,7 +1,7 @@
-"""Tests for langchain-mimir.
+"""Tests for langchain-perseus-vault.
 
 The unit tests monkeypatch ``subprocess.Popen`` with an in-process fake that
-speaks JSON-RPC 2.0 over fake stdin/stdout pipes and models Mimir's
+speaks JSON-RPC 2.0 over fake stdin/stdout pipes and models the Perseus Vault
 remember/recall behavior, so they run with no real ``mimir`` binary. They
 exercise the real RPC, threading, tool, and retriever code paths.
 
@@ -21,8 +21,8 @@ from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.tools import StructuredTool
 
-import langchain_mimir.client as client_mod
-from langchain_mimir import (
+import langchain_perseus_vault.client as client_mod
+from langchain_perseus_vault import (
     MimirClient,
     MimirError,
     MimirRetriever,

@@ -1,4 +1,4 @@
-"""LangChain integration surface for the Mimir memory engine.
+"""LangChain integration surface for the Perseus Vault memory engine.
 
 Two complementary, current-recommended ``langchain-core`` surfaces are exposed:
 
@@ -12,7 +12,7 @@ Two complementary, current-recommended ``langchain-core`` surfaces are exposed:
    query into ``Document`` objects, for drop-in use in RAG chains and anywhere a
    LangChain retriever is accepted (``.invoke(query)``).
 
-Both are thin wrappers over :class:`langchain_mimir.client.MimirClient`.
+Both are thin wrappers over :class:`langchain_perseus_vault.client.MimirClient`.
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ class MimirRetriever(BaseRetriever):
 
     Example::
 
-        from langchain_mimir import MimirClient, MimirRetriever
+        from langchain_perseus_vault import MimirClient, MimirRetriever
 
         client = MimirClient(db_path="~/.langchain/mimir.db")
         client.remember("The capital of France is Paris.")

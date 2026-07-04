@@ -1,4 +1,4 @@
-# langchain-mimir
+# langchain-perseus-vault
 
 Persistent, local-first, encrypted memory for [LangChain](https://www.langchain.com/),
 backed by [Perseus Vault](https://github.com/Perseus-Computing-LLC/perseus-vault) (formerly "Mimir"/"Mneme") — an open-source
@@ -38,7 +38,7 @@ On Windows the binary may be named `mimir.exe`; ensure its directory is on
 ## Install
 
 ```bash
-pip install langchain-mimir
+pip install langchain-perseus-vault
 ```
 
 ## Usage
@@ -46,7 +46,7 @@ pip install langchain-mimir
 ### As agent tools
 
 ```python
-from langchain_mimir import MimirClient, create_mimir_tools
+from langchain_perseus_vault import MimirClient, create_mimir_tools
 
 client = MimirClient(db_path="~/.langchain/mimir.db")
 tools = create_mimir_tools(client)  # [mimir_remember, mimir_recall]
@@ -64,7 +64,7 @@ resp = llm_with_memory.invoke("Remember that my favorite language is Rust.")
 ### As a retriever
 
 ```python
-from langchain_mimir import MimirClient, MimirRetriever
+from langchain_perseus_vault import MimirClient, MimirRetriever
 
 client = MimirClient(db_path="~/.langchain/mimir.db")
 client.remember("The capital of France is Paris.")
@@ -77,7 +77,7 @@ print(docs[0].page_content)  # -> "The capital of France is Paris."
 ### Direct client
 
 ```python
-from langchain_mimir import MimirClient
+from langchain_perseus_vault import MimirClient
 
 client = MimirClient(db_path="~/.langchain/mimir.db")
 client.remember("Project deadline is July 15.", tags=["project", "deadline"])

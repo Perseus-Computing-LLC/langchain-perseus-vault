@@ -13,7 +13,7 @@ request/response exchanges so they never interleave.
 Requirements:
     A ``mimir`` binary must be on ``$PATH`` or passed explicitly via
     ``mimir_binary``.  Download from:
-    https://github.com/Perseus-Computing-LLC/mimir/releases
+    https://github.com/Perseus-Computing-LLC/perseus-vault/releases
 """
 
 from __future__ import annotations
@@ -80,8 +80,8 @@ class MimirClient:
             if resolved is None:
                 raise MimirError(
                     f"mimir binary not found (looked for '{mimir_binary}'). "
-                    "Install Mimir from "
-                    "https://github.com/Perseus-Computing-LLC/mimir/releases "
+                    "Install Perseus Vault from "
+                    "https://github.com/Perseus-Computing-LLC/perseus-vault/releases "
                     "or pass the absolute path via mimir_binary=."
                 )
             self._mimir_binary = resolved
@@ -136,7 +136,7 @@ class MimirClient:
             {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {},
-                "clientInfo": {"name": "langchain-mimir", "version": "0.1.0"},
+                "clientInfo": {"name": "langchain-perseus-vault", "version": "0.1.0"},
             },
         )
         self._notify("notifications/initialized", {})
