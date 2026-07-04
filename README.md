@@ -1,5 +1,7 @@
 # langchain-perseus-vault
 
+> **📦 Package renamed.** Previously published on PyPI as [`langchain-mimir`](https://pypi.org/project/langchain-mimir/) (now archived). This project is now [`langchain-perseus-vault`](https://pypi.org/project/langchain-perseus-vault/) — install with `pip install langchain-perseus-vault`.
+
 Persistent, local-first, encrypted memory for [LangChain](https://www.langchain.com/),
 backed by [Perseus Vault](https://github.com/Perseus-Computing-LLC/perseus-vault) (formerly "Mimir"/"Mneme") — an open-source
 (MIT) memory engine with FTS5 + dense hybrid search and optional AES-256-GCM
