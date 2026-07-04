@@ -5,19 +5,20 @@ open-source (MIT), local-first, encrypted persistent memory engine that speaks
 MCP JSON-RPC over stdio. This package exposes it to LangChain via the modern
 ``langchain-core`` interfaces:
 
-- :class:`MimirClient` — low-level stdio client for the ``mimir`` binary.
-- :func:`create_mimir_tools` — ``StructuredTool``s (remember / recall) for agents.
-- :class:`MimirRetriever` — a ``BaseRetriever`` for RAG chains.
+- :class:`PerseusVaultClient` — low-level stdio client for the ``perseus-vault`` binary.
+- :func:`create_perseus_vault_tools` — ``StructuredTool``s (remember / recall) for agents.
+- :class:`PerseusVaultRetriever` — a ``BaseRetriever`` for RAG chains.
 
 Requirements:
-    A ``mimir`` binary must be on ``$PATH`` or passed via ``mimir_binary=``.
+    A ``perseus-vault`` binary must be on ``$PATH`` or passed via
+    ``perseus_vault_binary=``.
     Download from https://github.com/Perseus-Computing-LLC/perseus-vault/releases
 """
 
-from .client import MimirClient, MimirError
+from .client import PerseusVaultClient, PerseusVaultError
 from .integration import (
-    MimirRetriever,
-    create_mimir_tools,
+    PerseusVaultRetriever,
+    create_perseus_vault_tools,
     create_recall_tool,
     create_remember_tool,
 )
@@ -25,10 +26,10 @@ from .integration import (
 __version__ = "0.1.0"
 
 __all__ = [
-    "MimirClient",
-    "MimirError",
-    "MimirRetriever",
-    "create_mimir_tools",
+    "PerseusVaultClient",
+    "PerseusVaultError",
+    "PerseusVaultRetriever",
+    "create_perseus_vault_tools",
     "create_remember_tool",
     "create_recall_tool",
 ]

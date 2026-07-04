@@ -2,11 +2,11 @@
 
 The unit tests monkeypatch ``subprocess.Popen`` with an in-process fake that
 speaks JSON-RPC 2.0 over fake stdin/stdout pipes and models the Perseus Vault
-remember/recall behavior, so they run with no real ``mimir`` binary. They
-exercise the real RPC, threading, tool, and retriever code paths.
+remember/recall behavior, so they run with no real ``perseus-vault`` binary.
+They exercise the real RPC, threading, tool, and retriever code paths.
 
 A final smoke test runs a real remember->recall round trip if (and only if) a
-``mimir`` binary is discoverable; otherwise it is skipped.
+``perseus-vault`` binary is discoverable; otherwise it is skipped.
 """
 
 from __future__ import annotations
@@ -23,14 +23,14 @@ from langchain_core.tools import StructuredTool
 
 import langchain_perseus_vault.client as client_mod
 from langchain_perseus_vault import (
-    MimirClient,
-    MimirError,
-    MimirRetriever,
-    create_mimir_tools,
+    PerseusVaultClient,
+    PerseusVaultError,
+    PerseusVaultRetriever,
+    create_perseus_vault_tools,
 )
 
 
-# ── Fake Mimir MCP stdio server ──────────────────────────────────────────────
+# ── Fake Perseus Vault MCP stdio server ──────────────────────────────────────
 
 
 class _FakeStdin:
@@ -71,11 +71,12 @@ class _FakeStdout:
         self._q.put(None)
 
 
-class FakeMimir:
-    """Minimal Popen-compatible fake of the Mimir MCP stdio server.
+class FakePerseusVault:
+    """Minimal Popen-compatible fake of the Perseus Vault MCP stdio server.
 
     Models remember as an upsert into ``self.store`` and recall as a naive
-    OR-of-terms substring match over stored text, returning Mimir-shaped items.
+    OR-of-terms substring match over stored text, returning Perseus-Vault-shaped
+    items.
     """
 
     def __init__(self, *, answer_tools=True):
@@ -121,7 +122,7 @@ class FakeMimir:
     def _handle_tool(self, rid, params):
         name = params["name"]
         args = params["arguments"]
-        if name == "mimir_remember":
+        if name == "perseus_vault_remember":
             self._counter += 1
             ckey = (args["category"], args["key"])
             existed = ckey in self.store
@@ -147,7 +148,7 @@ class FakeMimir:
                 "id": self.store[ckey]["id"],
             }
             self._mcp_reply(rid, sc)
-        elif name == "mimir_recall":
+        elif name == "perseus_vault_recall":
             query = args.get("query", "").lower()
             terms = [t for t in query.split() if t]
             cat = args.get("category")
@@ -180,17 +181,17 @@ class FakeMimir:
 
 @pytest.fixture
 def fake_client(monkeypatch, tmp_path):
-    """A MimirClient wired to an in-process FakeMimir (no real binary)."""
-    fake = FakeMimir()
+    """A PerseusVaultClient wired to an in-process FakePerseusVault (no binary)."""
+    fake = FakePerseusVault()
 
     def fake_popen(argv, **kwargs):
         return fake
 
     monkeypatch.setattr(client_mod.subprocess, "Popen", fake_popen)
     # Make binary resolution succeed without a real executable.
-    monkeypatch.setattr(client_mod.shutil, "which", lambda name: "/fake/mimir")
+    monkeypatch.setattr(client_mod.shutil, "which", lambda name: "/fake/perseus-vault")
 
-    client = MimirClient(db_path=str(tmp_path / "mimir.db"))
+    client = PerseusVaultClient(db_path=str(tmp_path / "mimir.db"))
     client._fake = fake  # for assertions
     yield client
     client.close()
@@ -201,8 +202,11 @@ def fake_client(monkeypatch, tmp_path):
 
 def test_binary_not_found(monkeypatch, tmp_path):
     monkeypatch.setattr(client_mod.shutil, "which", lambda name: None)
-    with pytest.raises(MimirError, match="mimir binary not found"):
-        MimirClient(db_path=str(tmp_path / "x.db"), mimir_binary="definitely-missing")
+    with pytest.raises(PerseusVaultError, match="perseus-vault binary not found"):
+        PerseusVaultClient(
+            db_path=str(tmp_path / "x.db"),
+            perseus_vault_binary="definitely-missing",
+        )
 
 
 def test_remember_then_recall(fake_client):
@@ -234,13 +238,13 @@ def test_recall_no_match_returns_empty(fake_client):
 
 
 def test_rpc_timeout(monkeypatch, tmp_path):
-    fake = FakeMimir(answer_tools=True)
+    fake = FakePerseusVault(answer_tools=True)
     monkeypatch.setattr(client_mod.subprocess, "Popen", lambda *a, **k: fake)
-    monkeypatch.setattr(client_mod.shutil, "which", lambda name: "/fake/mimir")
-    client = MimirClient(db_path=str(tmp_path / "m.db"), timeout_s=0.3)
+    monkeypatch.setattr(client_mod.shutil, "which", lambda name: "/fake/perseus-vault")
+    client = PerseusVaultClient(db_path=str(tmp_path / "m.db"), timeout_s=0.3)
     # Flip the fake to stop answering tool calls -> the next call must time out.
     fake._answer_tools = False
-    with pytest.raises(MimirError, match="timed out"):
+    with pytest.raises(PerseusVaultError, match="timed out"):
         client.recall("anything")
     client.close()
 
@@ -248,16 +252,16 @@ def test_rpc_timeout(monkeypatch, tmp_path):
 # ── tools tests ──────────────────────────────────────────────────────────────
 
 
-def test_create_mimir_tools_shape(fake_client):
-    tools = create_mimir_tools(fake_client)
+def test_create_perseus_vault_tools_shape(fake_client):
+    tools = create_perseus_vault_tools(fake_client)
     assert len(tools) == 2
     assert all(isinstance(t, StructuredTool) for t in tools)
     names = {t.name for t in tools}
-    assert names == {"mimir_remember", "mimir_recall"}
+    assert names == {"perseus_vault_remember", "perseus_vault_recall"}
 
 
 def test_remember_tool_invoke(fake_client):
-    remember, recall = create_mimir_tools(fake_client)
+    remember, recall = create_perseus_vault_tools(fake_client)
     out = remember.invoke({"text": "I love Rust.", "tags": ["pref"]})
     assert "created" in out or "stored" in out
     # And it is recallable through the recall tool.
@@ -266,13 +270,13 @@ def test_remember_tool_invoke(fake_client):
 
 
 def test_recall_tool_no_results(fake_client):
-    _, recall = create_mimir_tools(fake_client)
+    _, recall = create_perseus_vault_tools(fake_client)
     out = recall.invoke({"query": "nothing here"})
     assert out == "No relevant memories found."
 
 
 def test_tool_args_schema_present(fake_client):
-    remember, recall = create_mimir_tools(fake_client)
+    remember, recall = create_perseus_vault_tools(fake_client)
     assert "text" in remember.args
     assert "query" in recall.args
 
@@ -281,13 +285,13 @@ def test_tool_args_schema_present(fake_client):
 
 
 def test_retriever_is_base_retriever(fake_client):
-    r = MimirRetriever(client=fake_client)
+    r = PerseusVaultRetriever(client=fake_client)
     assert isinstance(r, BaseRetriever)
 
 
 def test_retriever_returns_documents(fake_client):
     fake_client.remember("The capital of France is Paris.", key="k1")
-    retriever = MimirRetriever(client=fake_client, k=3)
+    retriever = PerseusVaultRetriever(client=fake_client, k=3)
     docs = retriever.invoke("What is the capital of France?")
     assert len(docs) == 1
     assert isinstance(docs[0], Document)
@@ -297,31 +301,41 @@ def test_retriever_returns_documents(fake_client):
 
 
 def test_retriever_empty(fake_client):
-    retriever = MimirRetriever(client=fake_client)
+    retriever = PerseusVaultRetriever(client=fake_client)
     assert retriever.invoke("zebra unicorn") == []
 
 
 def test_retriever_category_scoping(fake_client):
     fake_client.remember("scoped fact apple", category="catA", key="a")
     fake_client.remember("other fact apple", category="catB", key="b")
-    retriever = MimirRetriever(client=fake_client, category="catA")
+    retriever = PerseusVaultRetriever(client=fake_client, category="catA")
     docs = retriever.invoke("apple")
     assert len(docs) == 1
     assert docs[0].metadata["category"] == "catA"
 
 
-# ── real binary smoke test (skipped if mimir is unavailable) ─────────────────
+# ── real binary smoke test (skipped if perseus-vault is unavailable) ─────────
 
 
-def _find_mimir():
-    return shutil.which("mimir") or shutil.which("mimir.exe")
+def _find_perseus_vault():
+    return (
+        shutil.which("perseus-vault")
+        or shutil.which("perseus-vault.exe")
+        # `mimir` is only a compat symlink; accept it if present as a fallback.
+        or shutil.which("mimir")
+        or shutil.which("mimir.exe")
+    )
 
 
-@pytest.mark.skipif(_find_mimir() is None, reason="no real mimir binary on PATH")
+@pytest.mark.skipif(
+    _find_perseus_vault() is None, reason="no real perseus-vault binary on PATH"
+)
 def test_real_roundtrip(tmp_path):
-    """Real remember -> recall against an actual mimir subprocess."""
-    binary = _find_mimir()
-    client = MimirClient(db_path=str(tmp_path / "real.db"), mimir_binary=binary)
+    """Real remember -> recall against an actual perseus-vault subprocess."""
+    binary = _find_perseus_vault()
+    client = PerseusVaultClient(
+        db_path=str(tmp_path / "real.db"), perseus_vault_binary=binary
+    )
     try:
         client.remember(
             "The capital of France is Paris.", category="lc-smoke", key="smoke1"
@@ -329,7 +343,7 @@ def test_real_roundtrip(tmp_path):
         items = client.recall("capital France", category="lc-smoke")
         assert any("Paris" in (it.get("text") or "") for it in items)
 
-        retriever = MimirRetriever(client=client, category="lc-smoke")
+        retriever = PerseusVaultRetriever(client=client, category="lc-smoke")
         docs = retriever.invoke("capital of France")
         assert any("Paris" in d.page_content for d in docs)
     finally:
