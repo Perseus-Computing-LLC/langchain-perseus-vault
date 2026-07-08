@@ -33,9 +33,9 @@ dependencies = [
 test = ["pytest>=7.0"]
 
 [project.urls]
-Homepage = "https://github.com/Perseus-Computing-LLC/langchain-mimir"
-Repository = "https://github.com/Perseus-Computing-LLC/langchain-mimir"
-"Bug Tracker" = "https://github.com/Perseus-Computing-LLC/langchain-mimir/issues"
+Homepage = "https://github.com/Perseus-Computing-LLC/langchain-perseus-vault"
+Repository = "https://github.com/Perseus-Computing-LLC/langchain-perseus-vault"
+"Bug Tracker" = "https://github.com/Perseus-Computing-LLC/langchain-perseus-vault/issues"
 "Perseus Vault" = "https://github.com/Perseus-Computing-LLC/perseus-vault"
 
 [tool.hatch.build.targets.wheel]
