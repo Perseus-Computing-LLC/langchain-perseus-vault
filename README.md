@@ -54,7 +54,7 @@ pip install langchain-perseus-vault
 ```python
 from langchain_perseus_vault import PerseusVaultClient, create_perseus_vault_tools
 
-client = PerseusVaultClient(db_path="~/.langchain/mimir.db")
+client = PerseusVaultClient(db_path="~/.langchain/perseus-vault.db")
 tools = create_perseus_vault_tools(client)  # [perseus_vault_remember, perseus_vault_recall]
 
 # Bind to any tool-calling model / agent:
@@ -72,7 +72,7 @@ resp = llm_with_memory.invoke("Remember that my favorite language is Rust.")
 ```python
 from langchain_perseus_vault import PerseusVaultClient, PerseusVaultRetriever
 
-client = PerseusVaultClient(db_path="~/.langchain/mimir.db")
+client = PerseusVaultClient(db_path="~/.langchain/perseus-vault.db")
 client.remember("The capital of France is Paris.")
 
 retriever = PerseusVaultRetriever(client=client, k=5)
@@ -85,7 +85,7 @@ print(docs[0].page_content)  # -> "The capital of France is Paris."
 ```python
 from langchain_perseus_vault import PerseusVaultClient
 
-client = PerseusVaultClient(db_path="~/.langchain/mimir.db")
+client = PerseusVaultClient(db_path="~/.langchain/perseus-vault.db")
 client.remember("Project deadline is July 15.", tags=["project", "deadline"])
 items = client.recall("when is the deadline")
 print(items[0]["text"])
