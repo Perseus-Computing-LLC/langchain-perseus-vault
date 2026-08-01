@@ -49,7 +49,7 @@ class PerseusVaultClient:
 
     def __init__(
         self,
-        db_path: str = "~/.langchain/mimir.db",
+        db_path: str = "~/.langchain/perseus-vault.db",
         perseus_vault_binary: str = "perseus-vault",
         timeout_s: float = 30.0,
         encryption_key: str | None = None,
@@ -141,7 +141,7 @@ class PerseusVaultClient:
             {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {},
-                "clientInfo": {"name": "langchain-perseus-vault", "version": "0.1.0"},
+                "clientInfo": {"name": "langchain-perseus-vault", "version": "0.1.1"},
             },
         )
         self._notify("notifications/initialized", {})

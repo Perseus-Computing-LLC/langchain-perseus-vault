@@ -1,9 +1,9 @@
 # langchain-perseus-vault
 
-> **📦 Package renamed.** Previously published on PyPI as [`langchain-mimir`](https://pypi.org/project/langchain-mimir/) (now archived). This project is now [`langchain-perseus-vault`](https://pypi.org/project/langchain-perseus-vault/) — install with `pip install langchain-perseus-vault`.
+> **📦 Package rename history.** This distribution replaced the archived `langchain-mimir` project. Install `langchain-perseus-vault` for the current Perseus Vault integration.
 
 Persistent, local-first, encrypted memory for [LangChain](https://www.langchain.com/),
-backed by [Perseus Vault](https://github.com/Perseus-Computing-LLC/perseus-vault)  — an open-source
+backed by [Perseus Vault](https://github.com/Perseus-Computing-LLC/perseus-vault) — an open-source
 (MIT) memory engine with FTS5 + dense hybrid search and optional AES-256-GCM
 encryption, exposed over the Model Context Protocol (MCP) stdio transport.
 
@@ -38,8 +38,7 @@ stdio. You must have it installed:
   `PerseusVaultClient(perseus_vault_binary="/path/to/perseus-vault")`.
 
 On Windows the binary may be named `perseus-vault.exe`; ensure its directory is
-on `PATH`, or pass the full path. (Some installs also ship a `mimir` compat
-symlink, but `perseus-vault` is the canonical name.)
+on `PATH`, or pass the full path. `perseus-vault` is the canonical executable name.
 
 ## Install
 

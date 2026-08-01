@@ -191,7 +191,7 @@ def fake_client(monkeypatch, tmp_path):
     # Make binary resolution succeed without a real executable.
     monkeypatch.setattr(client_mod.shutil, "which", lambda name: "/fake/perseus-vault")
 
-    client = PerseusVaultClient(db_path=str(tmp_path / "mimir.db"))
+    client = PerseusVaultClient(db_path=str(tmp_path / "perseus-vault.db"))
     client._fake = fake  # for assertions
     yield client
     client.close()
